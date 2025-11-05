@@ -2,9 +2,9 @@ use pyo3::prelude::*;
 
 pub mod core;
 
-use crate::core::file_hasher::FileHasher;
-use crate::core::graph_creator::GraphCreator;
-use crate::core::project_initializer::ProjectInitializer;
+use crate::core::project_intializer::file_hasher::FileHasher;
+use crate::core::project_intializer::graph_creator::GraphCreator;
+use crate::core::project_intializer::project_initializer::ProjectInitializer;
 
 
 #[pyfunction]
@@ -14,6 +14,11 @@ fn init_project() -> PyResult<String> {
     let project_initializer = ProjectInitializer::new(file_hasher, graph_creator);
     project_initializer.init();
     Ok("Project initialized".to_string())
+}
+
+#[pyfunction]
+fn sync_project() -> PyResult<String> {
+    Ok("Project synchronized".to_string())
 }
 
 #[pymodule]
