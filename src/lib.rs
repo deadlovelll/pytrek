@@ -21,6 +21,16 @@ fn sync_project() -> PyResult<String> {
     Ok("Project synchronized".to_string())
 }
 
+#[pyfunction]
+fn sync_file_hashes() -> PyResult<String> {
+    Ok("File hashes synchronized".to_string())
+}
+
+#[pyfunction]
+fn sync_dependency_graph() -> PyResult<String> {
+    Ok("Graph synchronized".to_string())
+}
+
 #[pymodule]
 fn pytrek(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(init_project, m)?)?;
