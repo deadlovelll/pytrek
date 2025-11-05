@@ -1,4 +1,5 @@
 import typer
+import subprocess
 from pathlib import Path
 
 app = typer.Typer(help='pytrek')
@@ -20,4 +21,9 @@ def run(
         help='Root path of the project'
     ),
 ):
+    if all:
+        subprocess.run(['pytest', str(path)])
+
+@app.command()
+def init():
     pass
