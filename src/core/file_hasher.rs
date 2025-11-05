@@ -3,11 +3,11 @@ pub struct FileHasher {
 }
 
 impl FileHasher {
-    pub fn new(hashing_alg) -> Self {
+    pub fn new(hashing_alg: String) -> Self {
         Self { hashing_alg }
     }
 
-    pub hash(&self) {
+    pub fn hash(&self) {
         println!("Hello, {}!", self.hashing_alg);
     }
 }

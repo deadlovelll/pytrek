@@ -1,4 +1,4 @@
-struct GraphCreator {}
+pub struct GraphCreator {}
 
 impl GraphCreator {
     pub fn new() -> Self {
