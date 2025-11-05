@@ -34,5 +34,8 @@ fn sync_dependency_graph() -> PyResult<String> {
 #[pymodule]
 fn pytrek(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(init_project, m)?)?;
+    m.add_function(wrap_pyfunction!(sync_project, m)?)?;
+    m.add_function(wrap_pyfunction!(sync_file_hashes, m)?)?;
+    m.add_function(wrap_pyfunction!(sync_dependency_graph, m)?)?;
     Ok(())
 }

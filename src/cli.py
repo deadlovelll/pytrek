@@ -2,6 +2,13 @@ import typer
 import subprocess
 from pathlib import Path
 
+from pytrek import (
+    init_project,
+    sync_project,
+    sync_file_hashes,
+    sync_dependency_graph,
+)
+
 app = typer.Typer(help='pytrek')
 
 @app.command()
@@ -26,4 +33,16 @@ def run(
 
 @app.command()
 def init():
-    pass
+    init_project()
+    
+@app.command()
+def sync_project():
+    sync_project()
+
+@app.command()
+def sync_hashes():
+    sync_file_hashes()
+
+@app.command()
+def sync_graph():
+    sync_dependency_graph()

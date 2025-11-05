@@ -1,5 +1,5 @@
-use crate::core::file_hasher::FileHasher;
-use crate::core::graph_creator::GraphCreator;
+use crate::core::project_intializer::file_hasher::FileHasher;
+use crate::core::project_intializer::graph_creator::GraphCreator;
 
 pub struct ProjectInitializer {
     file_hasher: FileHasher,
