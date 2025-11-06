@@ -19,7 +19,7 @@ impl ProjectInitializer {
         Self { file_hasher, graph_creator, config_creator }
     }
 
-    pub fn init(&self) {
+    pub fn init(&mut self) {
         self.config_creator.create_config();
         self.file_hasher.hash(Path::new("./"));
         self.graph_creator.create_graph();

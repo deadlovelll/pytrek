@@ -13,7 +13,7 @@ fn init_project() -> PyResult<String> {
     let file_hasher = FileHasher::new();
     let graph_creator = GraphCreator::new();
     let config_creator = ConfigCreator::new();
-    let project_initializer = ProjectInitializer::new(
+    let mut project_initializer = ProjectInitializer::new(
         file_hasher, 
         graph_creator, 
         config_creator,

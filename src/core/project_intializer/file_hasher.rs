@@ -1,19 +1,28 @@
 use std::{fs, io};
 use std::io::{BufReader, Read};
 use std::path::{ Path };
-use regex::Regex;
+use std::collections::HashMap;
 
+use regex::Regex;
+use serde::{Serialize, Deserialize};
 use blake3;
 
-pub struct FileHasher {}
+// #[derive(Serialize, Deserialize)]
+// struct FileHashes {
+//     hashes: HashMap<String, String>
+// }
+
+pub struct FileHasher {
+    hash_map: HashMap<String, String>
+}
 
 impl FileHasher {
 
     pub fn new() -> Self {
-        Self {}
+        Self { hash_map: HashMap::new() }
     }
 
-    pub fn hash(&self, path: &Path) {
+    pub fn hash(&mut self, path: &Path) {
         let entries = fs::read_dir(path).unwrap();
         for entry in entries {
             let entry_result = entry.unwrap();
@@ -37,10 +46,17 @@ impl FileHasher {
                             break;
                         }
                     };
-                    println!("path is {}, hash is {}", entry_result.path().display(), file_hash);
+                    self.hash_map.insert(entry_result.path().display().to_string(), file_hash);
                 }
             }
         }
+        self.write_to_file();
+    }
+
+    fn write_to_file(&self) {
+        let json = serde_json::to_string_pretty(&self.hash_map)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e));
+        fs::write("./pytrek/file_hashes.json", json);
     }
 
     fn is_eligible(&self, path: &str) -> bool {
