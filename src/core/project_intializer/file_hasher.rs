@@ -55,8 +55,7 @@ impl FileHasher {
 
     fn is_eligible(&self, path: &str) -> bool {
         let ignore_regex = Regex::new(r"(^|/)(__+).*\.py$").unwrap();
-        return 
-        path.ends_with(".py") 
+        return path.ends_with(".py") 
         && !path.contains("venv")
         && !path.contains("test")
         && !ignore_regex.is_match(path)
