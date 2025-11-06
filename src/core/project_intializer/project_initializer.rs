@@ -19,7 +19,7 @@ impl ProjectInitializer {
 
     pub fn init(&self) {
         self.config_creator.create_config();
-        self.file_hasher.hash();
+        self.file_hasher.hash(String::from("./"));
         self.graph_creator.create_graph();
     }
 }

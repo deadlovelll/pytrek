@@ -28,14 +28,14 @@ impl ConfigCreator {
         let mut data_file = OpenOptions::new()
             .append(true)
             .open("pyproject.toml")
-            .expect("cannot open a file");
+            .expect("Cannot open a file");
 
         data_file
         .write_all(b"[tool.pytrek]\npath = '.'")
-        .expect("cannot write to file");
+        .expect("Cannot write to file");
     }
 
-    fn create_config_directory(&self) -> std::io::Result<()> {
+    fn create_config_directory(&self) -> io::Result<()> {
         fs::create_dir(".pytrek/")?;
         fs::File::create(".pytrek/file_hashes.json")?;
         fs::File::create(".pytrek/graph.json")?;
