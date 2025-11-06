@@ -1,3 +1,5 @@
+use std::path::{Path};
+
 use crate::core::project_intializer::file_hasher::FileHasher;
 use crate::core::project_intializer::graph_creator::GraphCreator;
 use crate::core::project_intializer::config_creator::ConfigCreator;
@@ -19,7 +21,7 @@ impl ProjectInitializer {
 
     pub fn init(&self) {
         self.config_creator.create_config();
-        self.file_hasher.hash(String::from("./"));
+        self.file_hasher.hash(Path::new("./"));
         self.graph_creator.create_graph();
     }
 }
