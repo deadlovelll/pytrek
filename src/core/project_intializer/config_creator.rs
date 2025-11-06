@@ -1,4 +1,5 @@
-use std::{fs, io};
+use std::{fs::{self, OpenOptions}, io::{self, Write}};
+use std::path::Path;
 
 pub struct ConfigCreator {}
 
@@ -14,7 +15,24 @@ impl ConfigCreator {
     }
 
     fn create_toml_config(&self) {
-        println!("hello");
+        let file_exists = Path::new("pyproject.toml").exists();
+        if file_exists {
+            self.write_toml_config();
+        } else {
+            fs::File::create("pyproject.toml");
+            self.write_toml_config();
+        }
+    }
+
+    fn write_toml_config(&self) {
+        let mut data_file = OpenOptions::new()
+            .append(true)
+            .open("pyproject.toml")
+            .expect("cannot open a file");
+
+        data_file
+        .write_all(b"[tool.pytrek]\npath = '.'")
+        .expect("cannot write to file");
     }
 
     fn create_config_directory(&self) -> std::io::Result<()> {
