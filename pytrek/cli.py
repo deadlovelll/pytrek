@@ -2,12 +2,7 @@ import typer
 import subprocess
 from pathlib import Path
 
-from pytrek import (
-    init_project,
-    sync_project,
-    sync_file_hashes,
-    sync_dependency_graph,
-)
+from . import pytrek
 
 app = typer.Typer(help='pytrek')
 
@@ -33,16 +28,20 @@ def run(
 
 @app.command()
 def init():
-    init_project()
+    result = pytrek.init_project()
+    typer.echo(result)
     
 @app.command()
 def sync_project():
-    sync_project()
+    result = pytrek.sync_project() 
+    typer.echo(result)
 
 @app.command()
 def sync_hashes():
-    sync_file_hashes()
+    result = pytrek.sync_file_hashes()
+    typer.echo(result)
 
 @app.command()
 def sync_graph():
-    sync_dependency_graph()
+    result = pytrek.sync_dependency_graph()
+    typer.echo(result)
