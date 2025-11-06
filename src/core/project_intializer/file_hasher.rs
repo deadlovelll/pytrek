@@ -21,27 +21,33 @@ impl FileHasher {
             if is_dir {
                 self.hash(&entry_result.path());
             } else {
-                let is_eligible = self.is_eligible(entry_result.path().display())
-                let file_hash = match self.get_file_hash(&entry_result.path()) {
-                    Ok(hash) => hash,
-                    Err(e) => {
-                        eprintln!(
-                            "Failed to hash file {}, error: {}", 
-                            entry_result.path().display(), 
-                            e
-                        );
-                        break;
-                    }
-                };
-                println!("path is {}, hash is {}", entry_result.path().display(), file_hash);
+                let path_str= entry_result.path();
+                let path = path_str.to_str().unwrap();
+                let is_eligible = self.is_eligible(path);
+                if is_eligible {
+                    let file_hash = match self.get_file_hash(&entry_result.path()) {
+                        Ok(hash) => hash,
+                        Err(e) => {
+                            eprintln!(
+                                "Failed to hash file {}, error: {}", 
+                                entry_result.path().display(), 
+                                e
+                            );
+                            break;
+                        }
+                    };
+                    println!("path is {}, hash is {}", entry_result.path().display(), file_hash);
+                }
             }
         }
     }
 
-    fn is_eligible(&self, path: &str) -> Result<bool> {
-        if path.ends_with(".py") {
-            Ok(true);
-        }
+    fn is_eligible(&self, path: &str) -> bool {
+        return 
+        path.ends_with(".py") 
+        && !path.contains("venv")
+        && !path.contains("test")
+        && !path.ends_with("__init__.py");
     }
 
     fn get_file_hash(&self, path: &Path) -> io::Result<String> {
