@@ -1,6 +1,7 @@
 use std::{fs, io};
 use std::io::{BufReader, Read};
 use std::path::{ Path };
+use regex::Regex;
 
 use blake3;
 
@@ -43,11 +44,12 @@ impl FileHasher {
     }
 
     fn is_eligible(&self, path: &str) -> bool {
+        let ignore_regex = Regex::new(r"(^|/)(__+).*\.py$").unwrap();
         return 
         path.ends_with(".py") 
         && !path.contains("venv")
         && !path.contains("test")
-        && !path.ends_with("__init__.py");
+        && !ignore_regex.is_match(path)
     }
 
     fn get_file_hash(&self, path: &Path) -> io::Result<String> {
