@@ -4,6 +4,7 @@ pub mod core;
 
 use crate::core::project_intializer::file_hasher::FileHasher;
 use crate::core::project_intializer::graph_creator::GraphCreator;
+use crate::core::project_intializer::config_creator::ConfigCreator;
 use crate::core::project_intializer::project_initializer::ProjectInitializer;
 
 
@@ -11,7 +12,12 @@ use crate::core::project_intializer::project_initializer::ProjectInitializer;
 fn init_project() -> PyResult<String> {
     let file_hasher = FileHasher::new(String::from("SHA-256"));
     let graph_creator = GraphCreator::new();
-    let project_initializer = ProjectInitializer::new(file_hasher, graph_creator);
+    let config_creator = ConfigCreator::new();
+    let project_initializer = ProjectInitializer::new(
+        file_hasher, 
+        graph_creator, 
+        config_creator,
+    );
     project_initializer.init();
     Ok("Project initialized".to_string())
 }
