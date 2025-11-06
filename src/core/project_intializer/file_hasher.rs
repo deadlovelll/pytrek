@@ -4,13 +4,12 @@ use std::path::{ Path };
 
 use blake3;
 
-pub struct FileHasher {
-    hashing_alg: String,
-}
+pub struct FileHasher {}
 
 impl FileHasher {
-    pub fn new(hashing_alg: String) -> Self {
-        Self { hashing_alg }
+
+    pub fn new() -> Self {
+        Self {}
     }
 
     pub fn hash(&self, path: &Path) {
@@ -22,6 +21,7 @@ impl FileHasher {
             if is_dir {
                 self.hash(&entry_result.path());
             } else {
+                let is_eligible = self.is_eligible(entry_result.path().display())
                 let file_hash = match self.get_file_hash(&entry_result.path()) {
                     Ok(hash) => hash,
                     Err(e) => {
@@ -35,6 +35,12 @@ impl FileHasher {
                 };
                 println!("path is {}, hash is {}", entry_result.path().display(), file_hash);
             }
+        }
+    }
+
+    fn is_eligible(&self, path: &str) -> Result<bool> {
+        if path.ends_with(".py") {
+            Ok(true);
         }
     }
 

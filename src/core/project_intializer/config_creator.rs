@@ -31,8 +31,8 @@ impl ConfigCreator {
             .expect("Cannot open a file");
 
         data_file
-        .write_all(b"[tool.pytrek]\npath = '.'")
-        .expect("Cannot write to file");
+            .write_all(b"[tool.pytrek]\npath = '.'")
+            .expect("Cannot write to file");
     }
 
     fn create_config_directory(&self) -> io::Result<()> {

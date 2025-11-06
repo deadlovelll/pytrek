@@ -10,7 +10,7 @@ use crate::core::project_intializer::project_initializer::ProjectInitializer;
 
 #[pyfunction]
 fn init_project() -> PyResult<String> {
-    let file_hasher = FileHasher::new(String::from("SHA-256"));
+    let file_hasher = FileHasher::new();
     let graph_creator = GraphCreator::new();
     let config_creator = ConfigCreator::new();
     let project_initializer = ProjectInitializer::new(
