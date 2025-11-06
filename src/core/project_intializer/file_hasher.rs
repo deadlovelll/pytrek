@@ -1,16 +1,10 @@
-use std::{fs, io};
-use std::io::{BufReader, Read};
+use std::{ fs, io };
+use std::io::{ BufReader, Read };
 use std::path::{ Path };
 use std::collections::HashMap;
 
 use regex::Regex;
-use serde::{Serialize, Deserialize};
 use blake3;
-
-// #[derive(Serialize, Deserialize)]
-// struct FileHashes {
-//     hashes: HashMap<String, String>
-// }
 
 pub struct FileHasher {
     hash_map: HashMap<String, String>
@@ -53,10 +47,10 @@ impl FileHasher {
         self.write_to_file();
     }
 
-    fn write_to_file(&self) {
-        let json = serde_json::to_string_pretty(&self.hash_map)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e));
-        fs::write("./pytrek/file_hashes.json", json);
+    fn write_to_file(&self) -> io::Result<()> {
+        let json = serde_json::to_string_pretty(&self.hash_map).unwrap();
+        fs::write("./.pytrek/file_hashes.json", json);
+        Ok(())
     }
 
     fn is_eligible(&self, path: &str) -> bool {
