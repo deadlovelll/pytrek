@@ -18,9 +18,10 @@ impl FileHasher {
         Self { hash_map: Mutex::new(HashMap::new())}
     }
 
-    pub fn hash(&self, path: &Path) {
+    pub fn hash(&self, path: &Path) -> io::Result<()> {
         self.walk(path);
-        self.write_to_file();
+        self.write_to_file()?;
+        Ok(())
     }
 
     fn walk(&self, path: &Path) {
@@ -40,7 +41,11 @@ impl FileHasher {
                             file_hash
                         );
                     }
-                    Err(e) => eprintln!("Failed to hash file {}: {}", entry.path().display(), e),
+                    Err(e) => eprintln!(
+                        "Failed to hash file {}: {}", 
+                        entry.path().display(), 
+                        e
+                    ),
                 }
             }
         });
@@ -48,7 +53,7 @@ impl FileHasher {
 
     fn write_to_file(&self) -> io::Result<()> {
         let json = serde_json::to_string_pretty(&self.hash_map).unwrap();
-        fs::write("./.pytrek/file_hashes.json", json);
+        fs::write("./.pytrek/file_hashes.json", json)?;
         Ok(())
     }
 

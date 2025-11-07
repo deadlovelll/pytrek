@@ -9,19 +9,20 @@ impl ConfigCreator {
     }
 
     pub fn create_config(&self) -> io::Result<()>{
-        self.create_toml_config();
+        self.create_toml_config()?;
         self.create_config_directory()?;
         Ok(())
     }
 
-    fn create_toml_config(&self) {
+    fn create_toml_config(&self) -> io::Result<()> {
         let file_exists = Path::new("pyproject.toml").exists();
         if file_exists {
             self.write_toml_config();
         } else {
-            fs::File::create("pyproject.toml");
+            fs::File::create("pyproject.toml")?;
             self.write_toml_config();
         }
+        Ok(())
     }
 
     fn write_toml_config(&self) {

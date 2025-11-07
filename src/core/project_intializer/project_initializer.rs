@@ -1,3 +1,4 @@
+use std::io;
 use std::path::{Path};
 use std::time::Instant;
 
@@ -20,11 +21,10 @@ impl ProjectInitializer {
         Self { file_hasher, graph_creator, config_creator }
     }
 
-    pub fn init(&mut self) {
-        self.config_creator.create_config();
-        let t1 = Instant::now();
-        self.file_hasher.hash(Path::new("./"));
-        println!("File hashing took: {:?}", t1.elapsed());
+    pub fn init(&mut self) -> io::Result<()> {
+        self.config_creator.create_config()?;
+        self.file_hasher.hash(Path::new("./"))?;
         self.graph_creator.create_graph();
+        Ok(())
     }
 }
