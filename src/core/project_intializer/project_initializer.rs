@@ -1,4 +1,5 @@
 use std::path::{Path};
+use std::time::Instant;
 
 use crate::core::project_intializer::file_hasher::FileHasher;
 use crate::core::project_intializer::graph_creator::GraphCreator;
@@ -21,7 +22,9 @@ impl ProjectInitializer {
 
     pub fn init(&mut self) {
         self.config_creator.create_config();
+        let t1 = Instant::now();
         self.file_hasher.hash(Path::new("./"));
+        println!("File hashing took: {:?}", t1.elapsed());
         self.graph_creator.create_graph();
     }
 }

@@ -2,49 +2,48 @@ use std::{ fs, io };
 use std::io::{ BufReader, Read };
 use std::path::{ Path };
 use std::collections::HashMap;
+use std::sync::Mutex;
 
 use regex::Regex;
-use blake3;
+use blake3::{self};
+use rayon::prelude::*;
 
 pub struct FileHasher {
-    hash_map: HashMap<String, String>
+    hash_map: Mutex<HashMap<String, String>>,
 }
 
 impl FileHasher {
 
     pub fn new() -> Self {
-        Self { hash_map: HashMap::new() }
+        Self { hash_map: Mutex::new(HashMap::new())}
     }
 
-    pub fn hash(&mut self, path: &Path) {
-        let entries = fs::read_dir(path).unwrap();
-        for entry in entries {
-            let entry_result = entry.unwrap();
-            let md = fs::metadata(entry_result.path()).unwrap();
-            let is_dir = md.is_dir();
-            if is_dir {
-                self.hash(&entry_result.path());
-            } else {
-                let path_str= entry_result.path();
-                let path = path_str.to_str().unwrap();
-                let is_eligible = self.is_eligible(path);
-                if is_eligible {
-                    let file_hash = match self.get_file_hash(&entry_result.path()) {
-                        Ok(hash) => hash,
-                        Err(e) => {
-                            eprintln!(
-                                "Failed to hash file {}, error: {}", 
-                                entry_result.path().display(), 
-                                e
-                            );
-                            break;
-                        }
-                    };
-                    self.hash_map.insert(entry_result.path().display().to_string(), file_hash);
+    pub fn hash(&self, path: &Path) {
+        self.walk(path);
+        self.write_to_file();
+    }
+
+    fn walk(&self, path: &Path) {
+        let entries: Vec<_> = fs::read_dir(path)
+            .unwrap()
+            .map(|e| e.unwrap())
+            .collect();
+
+        entries.par_iter().for_each(|entry| {
+            if entry.file_type().unwrap().is_dir() {
+                self.walk(&entry.path());
+            } else if self.is_eligible(entry.path().to_str().unwrap()) {
+                match self.get_file_hash(&entry.path()) {
+                    Ok(file_hash) => {
+                        self.hash_map.lock().unwrap().insert(
+                            entry.path().display().to_string(), 
+                            file_hash
+                        );
+                    }
+                    Err(e) => eprintln!("Failed to hash file {}: {}", entry.path().display(), e),
                 }
             }
-        }
-        self.write_to_file();
+        });
     }
 
     fn write_to_file(&self) -> io::Result<()> {
@@ -65,7 +64,7 @@ impl FileHasher {
         let f = fs::File::open(path)?;          
         let mut reader = BufReader::new(f);
         let mut hasher = blake3::Hasher::new();
-        let mut buffer = [0u8; 8 * 1024];
+        let mut buffer = [0u8; 8192];
 
         loop {
             let n = reader.read(&mut buffer)?;
