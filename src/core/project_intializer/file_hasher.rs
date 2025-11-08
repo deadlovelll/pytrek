@@ -4,9 +4,7 @@ use std::path::{ Path };
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-use regex::Regex;
 use blake3::{self};
-use rayon::prelude::*;
 
 pub struct FileHasher {
     hash_map: Mutex<HashMap<String, String>>,
@@ -19,50 +17,26 @@ impl FileHasher {
     }
 
     pub fn hash(&self, path: &Path) -> io::Result<()> {
-        self.walk(path);
-        self.write_to_file()?;
+        match self.get_file_hash(path) {
+            Ok(file_hash) => {
+                self.hash_map.lock().unwrap().insert(
+                    path.display().to_string(), 
+                    file_hash
+                );
+            }
+            Err(e) => eprintln!(
+                "Failed to hash file {}: {}", 
+                path.display(), 
+                e
+            ),
+        }
         Ok(())
     }
 
-    fn walk(&self, path: &Path) {
-        let entries: Vec<_> = fs::read_dir(path)
-            .unwrap()
-            .map(|e| e.unwrap())
-            .collect();
-
-        entries.par_iter().for_each(|entry| {
-            if entry.file_type().unwrap().is_dir() {
-                self.walk(&entry.path());
-            } else if self.is_eligible(entry.path().to_str().unwrap()) {
-                match self.get_file_hash(&entry.path()) {
-                    Ok(file_hash) => {
-                        self.hash_map.lock().unwrap().insert(
-                            entry.path().display().to_string(), 
-                            file_hash
-                        );
-                    }
-                    Err(e) => eprintln!(
-                        "Failed to hash file {}: {}", 
-                        entry.path().display(), 
-                        e
-                    ),
-                }
-            }
-        });
-    }
-
-    fn write_to_file(&self) -> io::Result<()> {
+    pub fn write_to_file(&self) -> io::Result<()> {
         let json = serde_json::to_string_pretty(&self.hash_map).unwrap();
         fs::write("./.pytrek/file_hashes.json", json)?;
         Ok(())
-    }
-
-    fn is_eligible(&self, path: &str) -> bool {
-        let ignore_regex = Regex::new(r"(^|/)(__+).*\.py$").unwrap();
-        return path.ends_with(".py") 
-        && !path.contains("venv")
-        && !path.contains("test")
-        && !ignore_regex.is_match(path)
     }
 
     fn get_file_hash(&self, path: &Path) -> io::Result<String> {
