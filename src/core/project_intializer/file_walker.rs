@@ -13,6 +13,7 @@ pub struct FileWalker {
 }
 
 impl FileWalker {
+    
     pub fn new() -> Self {
         Self {
             file_hasher: FileHasher::new(),

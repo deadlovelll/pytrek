@@ -10,6 +10,7 @@ pub struct ProjectInitializer {
 }
 
 impl ProjectInitializer {
+    
     pub fn new(
         file_walker: FileWalker,  
         config_creator: ConfigCreator
