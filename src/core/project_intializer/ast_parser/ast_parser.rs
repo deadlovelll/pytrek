@@ -9,7 +9,7 @@ use tree_sitter_python;
 use tree_sitter::StreamingIterator;
 
 pub struct AstParser {
-    file_data: Mutex<HashMap<String, Vec<String>>>
+    file_data: Mutex<HashMap<String, HashMap<String, Vec<String>>>>
 }
 
 impl AstParser {
@@ -28,32 +28,40 @@ impl AstParser {
         let tree = parser.parse(&code, None).unwrap();
         let root_node = tree.root_node();
         let query_src = r#"
-            (import_statement name: (dotted_name) @import)
-            (import_from_statement module_name: (dotted_name) @from_import)
+            (import_statement (dotted_name) @import)
+            (import_from_statement
+                module_name: (dotted_name) @module
+                name: (dotted_name) @name
+            )
         "#;
         let query = Query::new(&language, query_src).unwrap();
         let mut cursor = QueryCursor::new();
         let mut imports = vec![];
+        let mut defines: Vec<String> = vec![];
+        let mut uses: Vec<String> = vec![];
         let mut matches = cursor.matches(
             &query, 
             root_node, 
             code.as_bytes()
         );
+        let mut variables: HashMap<String, Vec<String>> = HashMap::new();
         while let Some(m) = matches.next() {
             for cap in m.captures.iter() {
                 let text = cap.node.utf8_text(code.as_bytes())
                 .unwrap()
                 .to_string();
+                println!("text is {}", text);
                 let name = query.capture_names()[cap.index as usize];
-                match name {
-                    "imports" | "from import" => imports.push(text),
-                    _ => {},
-                }
+                imports.push(text);
             }
         }
+        variables.insert("imports".to_string(), imports);
+        variables.insert("defines".to_string(), defines);
+        variables.insert("uses".to_string(), uses);
+
         self.file_data.lock().unwrap().insert(
             path.display().to_string(), 
-            imports,
+            variables,
         );
     }
 

@@ -24,6 +24,7 @@ impl FileWalker {
     pub fn run(&self, path: &Path) {
         self.walk(path);
         self.file_hasher.write_to_file();
+        self.graph_creator.write_to_file();
     }
 
     pub fn walk(&self, path: &Path) {
