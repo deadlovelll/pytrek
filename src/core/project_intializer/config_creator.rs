@@ -4,6 +4,7 @@ use std::path::Path;
 pub struct ConfigCreator {}
 
 impl ConfigCreator {
+    
     pub fn new() -> Self {
         Self {}
     }

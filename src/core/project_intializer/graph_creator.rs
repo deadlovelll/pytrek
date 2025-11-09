@@ -16,4 +16,8 @@ impl GraphCreator {
     pub fn create_graph(&self, path: &Path) {
         self.ast_parser.parse(path);
     }
+
+    pub fn write_to_file(&self) {
+        self.ast_parser.write_to_file();
+    }
 }

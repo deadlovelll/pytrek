@@ -2,9 +2,11 @@ use std::{fs};
 use std::path::Path;
 use std::collections::HashMap;
 use std::sync::Mutex;
+use std::io;
 
 use tree_sitter::{Language, Query, QueryCursor};
 use tree_sitter_python;
+use tree_sitter::StreamingIterator;
 
 pub struct AstParser {
     file_data: Mutex<HashMap<String, Vec<String>>>
@@ -21,7 +23,7 @@ impl AstParser {
         let mut parser = tree_sitter::Parser::new();
         let language: Language = tree_sitter_python::LANGUAGE.into();
         parser
-            .set_language(&language.into())
+            .set_language(&language)
             .expect("Error loading Python parser");
         let tree = parser.parse(&code, None).unwrap();
         let root_node = tree.root_node();
@@ -37,12 +39,15 @@ impl AstParser {
             root_node, 
             code.as_bytes()
         );
-        for m in matches {
-            for cap in m.captures {
-                let text = cap.node.utf8_text(code.as_bytes()).unwrap().to_string();
-                let name = query.capture_names()[cap.index as usize].as_str();
+        while let Some(m) = matches.next() {
+            for cap in m.captures.iter() {
+                let text = cap.node.utf8_text(code.as_bytes())
+                .unwrap()
+                .to_string();
+                let name = query.capture_names()[cap.index as usize];
                 match name {
                     "imports" | "from import" => imports.push(text),
+                    _ => {},
                 }
             }
         }
@@ -50,5 +55,11 @@ impl AstParser {
             path.display().to_string(), 
             imports,
         );
+    }
+
+    pub fn write_to_file(&self) -> io::Result<()> {
+        let json = serde_json::to_string_pretty(&self.file_data).unwrap();
+        fs::write("./.pytrek/file_data.json", json)?;
+        Ok(())
     }
 }
