@@ -74,9 +74,12 @@ impl AstParser {
                 }
             }
             if let Some(m) = module {
-                for n in names {
-                    let full_import = format!("{}.{}", m, n);
-                    imports.push(full_import);
+                let is_eligible: bool = self.import_classifier.is_eligible(&m);
+                if is_eligible {
+                    for n in names {
+                        let full_import = format!("{}.{}", m, n);
+                        imports.push(full_import);
+                    }
                 }
             }
         }
