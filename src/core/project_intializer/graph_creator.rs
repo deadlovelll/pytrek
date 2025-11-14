@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::collections::HashMap;
 
-use crate::core::project_intializer::ast_parser::AstParser;
+use crate::core::project_intializer::ast_parser::ast_parser::AstParser;
 
 pub struct GraphCreator {
     ast_data: HashMap<String, String>,

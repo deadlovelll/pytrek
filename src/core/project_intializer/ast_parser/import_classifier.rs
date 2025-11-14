@@ -3,7 +3,7 @@ pub struct ImportClassifier {
 }
 
 impl ImportClassifier {
-    pub fn new(&self) -> Self {
+    pub fn new() -> Self {
         let stdlib_modules: Vec<String> = [
             "__phello__", "_pyrepl", "asyncio", "collections", "compression",
             "concurrent", "ctypes", "curses", "dbm", "email", "encodings",
@@ -39,9 +39,12 @@ impl ImportClassifier {
         Self {stdlib_modules}
     }
 
-    pub fn is_eligible(&self, import: String) -> bool {
-        println!("hello");
-        return true;
+    pub fn is_eligible(&self, import: &String) -> bool {
+        if self.stdlib_modules.contains(import) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
