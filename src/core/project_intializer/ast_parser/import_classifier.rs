@@ -1,3 +1,6 @@
+use std::process::Command;
+use std::path::Path;
+
 /// Classifies Python imports as standard library or third-party/project-specific.
 pub struct ImportClassifier {
     /// List of standard library module names.
@@ -53,16 +56,41 @@ impl ImportClassifier {
     ///
     /// ```
     /// let classifier = ImportClassifier::new();
-    /// assert_eq!(classifier.is_eligible(&"infra.db.module".to_string()), true);
+    /// assert_eq!(classifier.is_eligible(&"infra.db.modules".to_string()), true);
     /// assert_eq!(classifier.is_eligible(&"os".to_string()), false);
     /// ```
     pub fn is_eligible(&self, import: &String) -> bool {
         // Checks is import from standard
         // library or not
-        if self.stdlib_modules.contains(import) {
-            return false;
-        } else {
-            return true;
-        }
+        true
+        // if self.stdlib_modules.contains(import) {
+        //     return false;
+        // } else if self.is_third_party(import) {
+        //     return false;
+        // } else {
+        //     return true;
+        // }
     }
+
+    // fn is_third_party(&self, import: &str) -> bool {
+    //     let site_packages = self.get_site_packages();
+    //     for sp in site_packages {
+    //         let path = Path::new(&sp).join(import);
+    //         println!("{}", path.to_string_lossy());
+    //         if path.exists() {
+    //             return true;
+    //         }
+    //     }
+    //     false
+    // }
+
+    // fn get_site_packages(&self) -> Vec<String> {
+    //     let output = Command::new("python3")
+    //         .args(&["-c", "import site; print('\\n'.join(site.getsitepackages()))"])
+    //         .output()
+    //         .expect("Failed to run python3");
+
+    //     let stdout = String::from_utf8_lossy(&output.stdout);
+    //     stdout.lines().map(|s| s.to_string()).collect()
+    // }
 }
