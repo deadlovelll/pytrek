@@ -1,8 +1,12 @@
+/// Classifies Python imports as standard library or third-party/project-specific.
 pub struct ImportClassifier {
+    /// List of standard library module names.
     stdlib_modules: Vec<String>
 }
 
 impl ImportClassifier {
+    /// Creates a new `ImportClassifier` and initializes the
+    /// list of standard library modules.
     pub fn new() -> Self {
         let stdlib_modules: Vec<String> = [
             "__phello__", "_pyrepl", "asyncio", "collections", "compression",
@@ -39,13 +43,26 @@ impl ImportClassifier {
         Self {stdlib_modules}
     }
 
+    /// Returns `true` if the import is project level.
+    ///
+    /// # Arguments
+    ///
+    /// * `import` - The module name to classify.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let classifier = ImportClassifier::new();
+    /// assert_eq!(classifier.is_eligible(&"infra.db.module".to_string()), true);
+    /// assert_eq!(classifier.is_eligible(&"os".to_string()), false);
+    /// ```
     pub fn is_eligible(&self, import: &String) -> bool {
+        // Checks is import from standard
+        // library or not
         if self.stdlib_modules.contains(import) {
             return false;
         } else {
             return true;
         }
     }
-
-
 }
