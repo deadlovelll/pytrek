@@ -7,10 +7,10 @@ use std::io;
 use tree_sitter::{Language, QueryCursor};
 use tree_sitter_python;
 
-use crate::core::project_intializer::ast_parser::import_classifier::ImportClassifier;
-use crate::core::project_intializer::ast_parser::query::ParseQuery;
-use crate::core::project_intializer::ast_parser::syntax_tree::SyntaxTree;
-use crate::core::project_intializer::ast_parser::tree_analyzer::TreeAnalyzer;
+use crate::core::ast_parser::import_classifier::ImportClassifier;
+use crate::core::ast_parser::query::ParseQuery;
+use crate::core::ast_parser::syntax_tree::SyntaxTree;
+use crate::core::ast_parser::tree_analyzer::TreeAnalyzer;
 
 pub struct AstParser {
     file_data: Mutex<HashMap<String, HashMap<String, Vec<String>>>>,

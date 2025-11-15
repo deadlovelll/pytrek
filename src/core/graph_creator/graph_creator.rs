@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::collections::HashMap;
 
-use crate::core::project_intializer::ast_parser::ast_parser::AstParser;
+use crate::core::AstParser;
 
 pub struct GraphCreator {
     ast_data: HashMap<String, String>,
@@ -13,7 +13,7 @@ impl GraphCreator {
         Self {ast_data: HashMap::new(), ast_parser: AstParser::new()}
     }
 
-    pub fn create_graph(&self, path: &Path) {
+    pub fn create_graph(&mut self, path: &Path) {
         self.ast_parser.parse(path);
     }
 

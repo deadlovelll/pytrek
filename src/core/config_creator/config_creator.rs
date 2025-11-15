@@ -1,4 +1,5 @@
-use std::{fs::{self, OpenOptions}, io::{self, Write}};
+use std::{fs::{self, OpenOptions}};
+use std::io::{self, Write};
 use std::path::Path;
 
 pub struct ConfigCreator {}

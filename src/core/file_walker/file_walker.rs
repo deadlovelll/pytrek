@@ -4,8 +4,8 @@ use std::path::Path;
 use regex::Regex;
 use rayon::prelude::*;
 
-use crate::core::project_intializer::file_hasher::FileHasher;
-use crate::core::project_intializer::graph_creator::GraphCreator;
+use crate::core::FileHasher;
+use crate::core::GraphCreator;
 
 pub struct FileWalker {
     file_hasher: FileHasher,
@@ -21,13 +21,13 @@ impl FileWalker {
         }
     }
 
-    pub fn run(&self, path: &Path) {
+    pub fn run(&mut self, path: &Path) {
         self.walk(path);
         self.file_hasher.write_to_file();
         self.graph_creator.write_to_file();
     }
 
-    pub fn walk(&self, path: &Path) {
+    pub fn walk(&mut self, path: &Path) {
         let entries: Vec<_> = fs::read_dir(path)
             .unwrap()
             .map(|e| e.unwrap())

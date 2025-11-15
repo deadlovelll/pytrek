@@ -1,8 +1,8 @@
 use std::io;
 use std::path::{Path};
 
-use crate::core::project_intializer::file_walker::FileWalker;
-use crate::core::project_intializer::config_creator::ConfigCreator;
+use crate::core::FileWalker;
+use crate::core::ConfigCreator;
 
 pub struct ProjectInitializer {
     file_walker: FileWalker,
