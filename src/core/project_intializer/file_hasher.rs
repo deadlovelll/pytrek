@@ -4,7 +4,7 @@ use std::path::{ Path };
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-use blake3::{self};
+use blake3::Hasher;
 
 pub struct FileHasher {
     // Stores file paths and their corresponding hashes.
@@ -67,7 +67,7 @@ impl FileHasher {
         let mut reader = BufReader::new(f);
 
         // Initialize the BLAKE3 hasher.
-        let mut hasher = blake3::Hasher::new();
+        let mut hasher = Hasher::new();
 
         // Reusable 8 KB buffer to avoid allocating per read.
         let mut buffer = [0u8; 8192];

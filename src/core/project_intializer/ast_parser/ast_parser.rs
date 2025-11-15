@@ -4,15 +4,19 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::io;
 
-use tree_sitter::{Language, Query, QueryCursor};
+use tree_sitter::{Language, QueryCursor};
 use tree_sitter_python;
 use tree_sitter::StreamingIterator;
 
 use crate::core::project_intializer::ast_parser::import_classifier::ImportClassifier;
+use crate::core::project_intializer::ast_parser::query::ParseQuery;
+use crate::core::project_intializer::ast_parser::syntax_tree::SyntaxTree;
 
 pub struct AstParser {
     file_data: Mutex<HashMap<String, HashMap<String, Vec<String>>>>,
     import_classifier: ImportClassifier,
+    query: ParseQuery,
+    tree: SyntaxTree,
 }
 
 impl AstParser {
@@ -21,36 +25,31 @@ impl AstParser {
         Self {
             file_data: Mutex::new(HashMap::new()),
             import_classifier: ImportClassifier::new(),
+            query: ParseQuery::new(),
+            tree: SyntaxTree::new(),
         }
     }
 
     pub fn parse(&self, path: &Path) {
-        let code = fs::read_to_string(path).expect("Failed to read file");
-        let mut parser = tree_sitter::Parser::new();
-        let language: Language = tree_sitter_python::LANGUAGE.into();
-        parser
-            .set_language(&language)
-            .expect("Error loading Python parser");
-        let tree = parser.parse(&code, None).unwrap();
-        let root_node = tree.root_node();
-        let query_src = r#"
-            (import_statement (dotted_name) @import)
-            (import_from_statement
-                module_name: (dotted_name) @module
-                name: (dotted_name) @name
-            )
-        "#;
-        let query = Query::new(&language, query_src).unwrap();
-        let mut cursor = QueryCursor::new();
         let mut imports: Vec<String> = vec![];
         let mut defines: Vec<String> = vec![];
         let mut uses: Vec<String> = vec![];
+        let mut variables: HashMap<String, Vec<String>> = HashMap::new();
+
+        let code = fs::read_to_string(path).expect("Failed to read file");
+        let language: Language = tree_sitter_python::LANGUAGE.into();
+
+        let tree = self.tree.get(&code, &language);
+        let root_node = tree.root_node();
+        let query = self.query.get(language);
+        
+        let mut cursor = QueryCursor::new();
         let mut matches = cursor.matches(
             &query, 
             root_node, 
             code.as_bytes()
         );
-        let mut variables: HashMap<String, Vec<String>> = HashMap::new();
+        
         while let Some(m) = matches.next() {
             let mut module: Option<String> = None;
             let mut names: Vec<String> = Vec::new();
