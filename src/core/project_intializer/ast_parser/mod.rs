@@ -3,3 +3,4 @@ pub mod import_classifier;
 pub mod query;
 pub mod syntax_tree;
 pub mod tree_analyzer;
+pub mod dot_name;

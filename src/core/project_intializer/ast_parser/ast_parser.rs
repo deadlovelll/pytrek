@@ -6,17 +6,18 @@ use std::io;
 
 use tree_sitter::{Language, QueryCursor};
 use tree_sitter_python;
-use tree_sitter::StreamingIterator;
 
 use crate::core::project_intializer::ast_parser::import_classifier::ImportClassifier;
 use crate::core::project_intializer::ast_parser::query::ParseQuery;
 use crate::core::project_intializer::ast_parser::syntax_tree::SyntaxTree;
+use crate::core::project_intializer::ast_parser::tree_analyzer::TreeAnalyzer;
 
 pub struct AstParser {
     file_data: Mutex<HashMap<String, HashMap<String, Vec<String>>>>,
     import_classifier: ImportClassifier,
     query: ParseQuery,
     tree: SyntaxTree,
+    tree_analyzer: TreeAnalyzer,
 }
 
 impl AstParser {
@@ -27,6 +28,7 @@ impl AstParser {
             import_classifier: ImportClassifier::new(),
             query: ParseQuery::new(),
             tree: SyntaxTree::new(),
+            tree_analyzer: TreeAnalyzer::new(),
         }
     }
 
@@ -49,39 +51,8 @@ impl AstParser {
             root_node, 
             code.as_bytes()
         );
+        self.tree_analyzer.analyze(matches, code, query, &imports, &defines, &uses);
         
-        while let Some(m) = matches.next() {
-            let mut module: Option<String> = None;
-            let mut names: Vec<String> = Vec::new();
-            for cap in m.captures.iter() {
-                let name = query.capture_names()[cap.index as usize];
-                match name {
-                    "module" => {
-                        module = Some(self.dotted_name(&code, cap.node));
-                    }
-                    "name" => {
-                        names.push(self.dotted_name(&code, cap.node));
-                    }
-                    "import" => {
-                        let text = self.dotted_name(&code, cap.node);
-                        let is_eligible: bool = self.import_classifier.is_eligible(&text);
-                        if is_eligible {
-                            imports.push(text);
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            if let Some(m) = module {
-                let is_eligible: bool = self.import_classifier.is_eligible(&m);
-                if is_eligible {
-                    for n in names {
-                        let full_import = format!("{}.{}", m, n);
-                        imports.push(full_import);
-                    }
-                }
-            }
-        }
         variables.insert("imports".to_string(), imports);
         variables.insert("defines".to_string(), defines);
         variables.insert("uses".to_string(), uses);
@@ -90,13 +61,6 @@ impl AstParser {
             path.display().to_string(), 
             variables,
         );
-    }
-
-    fn dotted_name(&self, code: &str, node: tree_sitter::Node) -> String {
-        let text = node.utf8_text(code.as_bytes())
-        .unwrap()
-        .to_string();
-        return text;
     }
 
     pub fn write_to_file(&self) -> io::Result<()> {
