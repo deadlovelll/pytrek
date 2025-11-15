@@ -32,7 +32,7 @@ impl AstParser {
         }
     }
 
-    pub fn parse(&self, path: &Path) {
+    pub fn parse(&mut self, path: &Path) {
         let mut imports: Vec<String> = vec![];
         let mut defines: Vec<String> = vec![];
         let mut uses: Vec<String> = vec![];
@@ -51,7 +51,7 @@ impl AstParser {
             root_node, 
             code.as_bytes()
         );
-        self.tree_analyzer.analyze(matches, code, query, &imports, &defines, &uses);
+        self.tree_analyzer.analyze(matches, &code, &query, &mut imports, &defines, &uses);
         
         variables.insert("imports".to_string(), imports);
         variables.insert("defines".to_string(), defines);

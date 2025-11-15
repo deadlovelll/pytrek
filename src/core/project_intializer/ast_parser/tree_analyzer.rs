@@ -1,4 +1,4 @@
-use tree_sitter::{Query, QueryMatches, StreamingIterator};
+use tree_sitter::{Query, QueryMatches};
 
 use crate::core::project_intializer::ast_parser::import_classifier::ImportClassifier;
 use crate::core::project_intializer::ast_parser::dot_name::DotName;
@@ -17,11 +17,11 @@ impl TreeAnalyzer {
     }
 
     pub fn analyze(
-        &self,
-        matches: QueryMatches<'_, '_, &[u8], &[u8]>,
-        code: String,
-        query: Query,
-        imports: &Vec<String>,
+        &mut self,
+        matches: &mut QueryMatches,
+        code: &str,
+        query: &Query,
+        imports: &mut Vec<String>,
         defines: &Vec<String>,
         uses: &Vec<String>,
     ) {
