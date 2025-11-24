@@ -21,13 +21,13 @@ impl FileWalker {
         }
     }
 
-    pub fn run(&mut self, path: &Path) {
+    pub fn run(&self, path: &Path) {
         self.walk(path);
         self.file_hasher.write_to_file();
         self.graph_creator.write_to_file();
     }
 
-    pub fn walk(&mut self, path: &Path) {
+    pub fn walk(&self, path: &Path) {
         let entries: Vec<_> = fs::read_dir(path)
             .unwrap()
             .map(|e| e.unwrap())

@@ -13,7 +13,7 @@ impl GraphCreator {
         Self {ast_data: HashMap::new(), ast_parser: AstParser::new()}
     }
 
-    pub fn create_graph(&mut self, path: &Path) {
+    pub fn create_graph(&self, path: &Path) {
         self.ast_parser.parse(path);
     }
 

@@ -17,14 +17,16 @@ impl TreeAnalyzer {
     }
 
     pub fn analyze(
-        &mut self,
-        matches: &mut QueryMatches,
+        self,
+        matches: &QueryMatches,
         code: &str,
         query: &Query,
-        imports: &mut Vec<String>,
-        defines: &Vec<String>,
-        uses: &Vec<String>,
-    ) {
+    ) -> (Vec<String>, Vec<String>, Vec<String>) {
+
+        let mut imports: Vec<String> = vec![];
+        let mut defines: Vec<String> = vec![];
+        let mut uses: Vec<String> = vec![];
+        
         while let Some(m) = matches.next() {
             let mut module: Option<String> = None;
             let mut names: Vec<String> = Vec::new();
@@ -57,5 +59,6 @@ impl TreeAnalyzer {
                 }
             }
         }
+        return (imports, defines, uses)
     }
 }

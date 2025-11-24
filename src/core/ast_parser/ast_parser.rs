@@ -32,10 +32,7 @@ impl AstParser {
         }
     }
 
-    pub fn parse(&mut self, path: &Path) {
-        let mut imports: Vec<String> = vec![];
-        let mut defines: Vec<String> = vec![];
-        let mut uses: Vec<String> = vec![];
+    pub fn parse(&self, path: &Path) {
         let mut variables: HashMap<String, Vec<String>> = HashMap::new();
 
         let code = fs::read_to_string(path).expect("Failed to read file");
@@ -51,7 +48,10 @@ impl AstParser {
             root_node, 
             code.as_bytes()
         );
-        self.tree_analyzer.analyze(matches, &code, &query, &mut imports, &defines, &uses);
+        let result = self.tree_analyzer.analyze(matches, &code, &query);
+        let imports = result.0;
+        let defines = result.1;
+        let uses = result.2;
         
         variables.insert("imports".to_string(), imports);
         variables.insert("defines".to_string(), defines);
