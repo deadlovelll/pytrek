@@ -15,6 +15,9 @@ impl ParseQuery {
                 module_name: (dotted_name) @module
                 name: (dotted_name) @name
             )
+            (function_definition
+                name: (identifier) @func_name
+            )
         "#;
         let query = Query::new(&language, query_src).unwrap();
         return query;

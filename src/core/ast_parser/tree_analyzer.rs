@@ -52,6 +52,10 @@ impl TreeAnalyzer {
                             imports.push(text);
                         }
                     }
+                    "func_name" => {
+                        let text = self.dot_name.get(&code, cap.node);
+                        println!("{}", text)
+                    }
                     _ => {}
                 }
             }
