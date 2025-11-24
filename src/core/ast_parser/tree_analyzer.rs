@@ -1,7 +1,7 @@
-use tree_sitter::{Query, QueryMatches};
+use tree_sitter::{Query, Node, QueryCursor, StreamingIterator};
 
-use crate::core::project_intializer::ast_parser::import_classifier::ImportClassifier;
-use crate::core::project_intializer::ast_parser::dot_name::DotName;
+use crate::core::ast_parser::import_classifier::ImportClassifier;
+use crate::core::ast_parser::dot_name::DotName;
 
 pub struct TreeAnalyzer {
     import_classifier: ImportClassifier,
@@ -17,15 +17,21 @@ impl TreeAnalyzer {
     }
 
     pub fn analyze(
-        self,
-        matches: &QueryMatches,
+        &self,
         code: &str,
         query: &Query,
+        root_node: Node,
     ) -> (Vec<String>, Vec<String>, Vec<String>) {
 
         let mut imports: Vec<String> = vec![];
         let mut defines: Vec<String> = vec![];
         let mut uses: Vec<String> = vec![];
+        let mut cursor = QueryCursor::new();
+        let mut matches = cursor.matches(
+            &query, 
+            root_node, 
+            code.as_bytes()
+        );
         
         while let Some(m) = matches.next() {
             let mut module: Option<String> = None;

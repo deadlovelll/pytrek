@@ -2,8 +2,8 @@ use pyo3::prelude::*;
 
 pub mod core;
 
-use crate::core::project_intializer::file_walker::FileWalker;
-use crate::core::project_intializer::config_creator::ConfigCreator;
+use crate::core::file_walker::file_walker::FileWalker;
+use crate::core::config_creator::config_creator::ConfigCreator;
 use crate::core::project_intializer::project_initializer::ProjectInitializer;
 
 

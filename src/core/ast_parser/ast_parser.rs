@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::io;
 
-use tree_sitter::{Language, QueryCursor};
+use tree_sitter::{Language};
 use tree_sitter_python;
 
 use crate::core::ast_parser::import_classifier::ImportClassifier;
@@ -34,7 +34,6 @@ impl AstParser {
 
     pub fn parse(&self, path: &Path) {
         let mut variables: HashMap<String, Vec<String>> = HashMap::new();
-
         let code = fs::read_to_string(path).expect("Failed to read file");
         let language: Language = tree_sitter_python::LANGUAGE.into();
 
@@ -42,13 +41,11 @@ impl AstParser {
         let root_node = tree.root_node();
         let query = self.query.get(language);
         
-        let mut cursor = QueryCursor::new();
-        let mut matches = cursor.matches(
+        let result = self.tree_analyzer.analyze(
+            &code, 
             &query, 
-            root_node, 
-            code.as_bytes()
+            root_node,
         );
-        let result = self.tree_analyzer.analyze(matches, &code, &query);
         let imports = result.0;
         let defines = result.1;
         let uses = result.2;
