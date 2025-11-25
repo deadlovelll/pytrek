@@ -58,19 +58,17 @@ impl TreeAnalyzer {
                         let text = self.dot_name.get(&code, cap.node);
                         if !text.starts_with("__") & !text.ends_with("__") {
                             let mut parent = cap.node.parent();
-                            if parent != None {
-                                while let Some(p) = parent {
-                                    if p.kind() == "class_definition" {
-                                        if let Some(name_node) = p.child_by_field_name("name") {
-                                            let class = name_node.utf8_text(code.as_bytes())
-                                            .unwrap()
-                                            .to_string();
-                                            let class_method = format!("{class}.{text}");
-                                            defines.push(class_method);
-                                        }
+                            while let Some(p) = parent {
+                                if p.kind() == "class_definition" {
+                                    if let Some(name_node) = p.child_by_field_name("name") {
+                                        let class = name_node.utf8_text(code.as_bytes())
+                                        .unwrap()
+                                        .to_string();
+                                        let class_method = format!("{class}.{text}");
+                                        defines.push(class_method);
                                     }
-                                    parent = p.parent();
                                 }
+                                parent = p.parent();
                             }
                         }
                     }
