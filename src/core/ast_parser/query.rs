@@ -16,7 +16,7 @@ impl ParseQuery {
                 name: (dotted_name) @name
             )
             (function_definition
-                name: (identifier) @func_name
+                name: (identifier) @function
             )
         "#;
         let query = Query::new(&language, query_src).unwrap();
