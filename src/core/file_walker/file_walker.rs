@@ -53,15 +53,19 @@ impl FileWalker {
     }
 
     fn is_eligible(&self, path: &str) -> bool {
-        let ignore_regex = Regex::new(
-            r"^(?!.*venv)(?!.*test)(?!.*(?:^|/)(__+).+\.py$).+\.py$"
-        ).unwrap();
-        return !ignore_regex.is_match(path)
+        let ignore_regex = Regex::new(r"(^|/)(__+).*\.py$").unwrap();
+        return path.ends_with(".py") 
+        && !path.contains("venv")
+        && !path.contains("test")
+        && !ignore_regex.is_match(path)
     }
 
     fn is_eligible_dir(&self, path: &str) -> bool {
-        let dir_regex = Regex::new(r"^(?!.*cache)(?!__.*__)(?!\.venv).*").unwrap();
-        return dir_regex.is_match(path);
+        return !path.contains("cache")       
+        && !path.starts_with("__")   
+        && !path.ends_with("__")     
+        && !path.contains("venv")      
+        && !path.starts_with('.')  
     }
 
     fn get_root_dirs(&self, path: &Path) -> Vec<String> {
@@ -69,9 +73,11 @@ impl FileWalker {
         let entries = self.get_entries(path);
         for root_entry in entries {
             if root_entry.path().is_dir() {
-                if self.is_eligible_dir(root_entry.path().to_str().unwrap()) {
-                    println!("{}", path.display().to_string());
-                    root_dirs.push(path.display().to_string());
+                if self.is_eligible_dir(&root_entry.path().to_str().unwrap()[2..]) {
+                    if let Some(name) = root_entry.path().file_name() {
+                        let name = name.to_string_lossy().to_string();
+                        root_dirs.push(name);
+                    }
                 }
             }
         }
