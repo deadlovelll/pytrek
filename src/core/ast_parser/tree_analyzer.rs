@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use tree_sitter::{Query, Node, QueryCursor, StreamingIterator};
 
 use crate::core::ast_parser::import_classifier::ImportClassifier;
@@ -23,6 +21,7 @@ impl TreeAnalyzer {
         code: &str,
         query: &Query,
         root_node: Node,
+        root_dirs: &Vec<String>,
     ) -> (Vec<String>, Vec<String>, Vec<String>) {
 
         let mut imports: Vec<String> = vec![];
@@ -49,7 +48,7 @@ impl TreeAnalyzer {
                     }
                     "import" => {
                         let text = self.dot_name.get(&code, cap.node);
-                        let is_eligible: bool = self.import_classifier.is_eligible(&text);
+                        let is_eligible: bool = self.import_classifier.is_eligible(&text, root_dirs);
                         if is_eligible {
                             imports.push(text);
                         }
@@ -58,6 +57,7 @@ impl TreeAnalyzer {
                         let text = self.dot_name.get(&code, cap.node);
                         if !text.starts_with("__") & !text.ends_with("__") {
                             let mut parent = cap.node.parent();
+                            let mut found_class = false;
                             while let Some(p) = parent {
                                 if p.kind() == "class_definition" {
                                     if let Some(name_node) = p.child_by_field_name("name") {
@@ -66,9 +66,13 @@ impl TreeAnalyzer {
                                         .to_string();
                                         let class_method = format!("{class}.{text}");
                                         defines.push(class_method);
+                                        found_class = true;
                                     }
                                 }
                                 parent = p.parent();
+                            }
+                            if !found_class {
+                                defines.push(text);
                             }
                         }
                     }
@@ -76,7 +80,7 @@ impl TreeAnalyzer {
                 }
             }
             if let Some(m) = module {
-                let is_eligible: bool = self.import_classifier.is_eligible(&m);
+                let is_eligible: bool = self.import_classifier.is_eligible(&m, root_dirs);
                 if is_eligible {
                     for n in names {
                         let full_import = format!("{}.{}", m, n);

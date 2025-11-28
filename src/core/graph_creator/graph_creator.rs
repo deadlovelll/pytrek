@@ -13,8 +13,12 @@ impl GraphCreator {
         Self {ast_data: HashMap::new(), ast_parser: AstParser::new()}
     }
 
-    pub fn create_graph(&self, path: &Path) {
-        self.ast_parser.parse(path);
+    pub fn create_graph(
+        &self, 
+        path: &Path,
+        root_dirs: &Vec<String>,
+    ) {
+        self.ast_parser.parse(path, root_dirs);
     }
 
     pub fn write_to_file(&self) {

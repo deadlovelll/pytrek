@@ -32,7 +32,7 @@ impl AstParser {
         }
     }
 
-    pub fn parse(&self, path: &Path) {
+    pub fn parse(&self, path: &Path, root_dirs: &Vec<String>) {
         let mut variables: HashMap<String, Vec<String>> = HashMap::new();
         let code = fs::read_to_string(path).expect("Failed to read file");
         let language: Language = tree_sitter_python::LANGUAGE.into();
@@ -45,6 +45,7 @@ impl AstParser {
             &code, 
             &query, 
             root_node,
+            root_dirs,
         );
         let imports = result.0;
         let defines = result.1;

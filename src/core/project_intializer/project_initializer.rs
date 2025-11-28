@@ -49,7 +49,7 @@ impl ProjectInitializer {
     /// Returns an `io::Error` if configuration creation fails.
     pub fn init(&mut self) -> io::Result<()> {
         self.config_creator.create_config()?;
-        self.file_walker.run(Path::new("./"));
+        self.file_walker.run(Path::new("."));
         Ok(())
     }
 }
