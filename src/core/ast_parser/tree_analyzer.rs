@@ -54,8 +54,8 @@ impl TreeAnalyzer {
                         }
                     }
                     "function" => {
-                        let text = self.dot_name.get(&code, cap.node);
-                        if !text.starts_with("__") & !text.ends_with("__") {
+                        let function = self.dot_name.get(&code, cap.node);
+                        if !function.starts_with("__") & !function.ends_with("__") {
                             let mut parent = cap.node.parent();
                             let mut found_class = false;
                             while let Some(p) = parent {
@@ -64,7 +64,7 @@ impl TreeAnalyzer {
                                         let class = name_node.utf8_text(code.as_bytes())
                                         .unwrap()
                                         .to_string();
-                                        let class_method = format!("{class}.{text}");
+                                        let class_method = format!("{class}.{function}");
                                         defines.push(class_method);
                                         found_class = true;
                                     }
@@ -72,7 +72,7 @@ impl TreeAnalyzer {
                                 parent = p.parent();
                             }
                             if !found_class {
-                                defines.push(text);
+                                defines.push(function);
                             }
                         }
                     }
