@@ -23,3 +23,60 @@ impl ParseQuery {
         return query;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::*;
+    use blake3::Hash;
+    use tree_sitter::QueryCursor;
+    use tree_sitter::StreamingIterator;
+
+    #[test]
+    fn test_gets_query() {
+        let query = ParseQuery::new();
+        let language: Language = tree_sitter_python::LANGUAGE.into();
+        let results = query.get(language);
+        let _: Query = results;
+    }
+
+    #[test]
+    fn test_query_returns_imports() {
+        let code = r#"
+            import os
+            from sys import path
+            import fastapi
+            from service.something import Something
+        "#;
+
+        let query = ParseQuery::new();
+        let language: Language = tree_sitter_python::LANGUAGE.into();
+
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(&language)
+            .expect("Error loading Python parser");
+        
+        let tree = parser.parse(&code, None).unwrap();
+        let root_node = tree.root_node();
+        let results = query.get(language);
+        
+        let mut cursor = QueryCursor::new();
+        let mut matches = cursor.matches(
+            &results, 
+            root_node, 
+            code.as_bytes()
+        );
+
+        let mut seen: HashSet<&str> = HashSet::new();
+        
+        while let Some(m) = matches.next() {
+            for cap in m.captures.iter() {
+                let name = results.capture_names()[cap.index as usize];
+                seen.insert(name);
+            }
+        }
+        assert_eq!(seen.len(), 3);
+    }
+}
